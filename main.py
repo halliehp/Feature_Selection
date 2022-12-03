@@ -18,21 +18,27 @@ def test_accuracy(data):
     count_of_correctly_classified = 0
     for i in range(len(data)):
         object_to_classify = data.iloc[i, 1:7]  # features
-        print(object_to_classify)
+        # print(object_to_classify)
         label_object_to_classify = data.iloc[i, 0]  # class label
 
-        nearest_neighbor_distance = 0
-        nearest_neighbor_location = 0
-        for k in range(len(data)):
+        nearest_neighbor_distance = 10000
+        nearest_neighbor_location = 10000
+        nearest_neighbor_label = 0
+        for k in range(len(data.columns)-1):
             if k is not i:
-                print('Ask if', str(i+1), 'is nearest neighbor with', str(k+1))
-                distance = math.sqrt(sum(object_to_classify-data.iloc[k, 1:7]))  # one feature or all of them ?
+                print('Ask if', str(i), 'is nearest neighbor with', str(k))
+                distance = math.sqrt(sum((object_to_classify[k]-data.iloc[k])**2))  # one feature or all of them ?
                 if distance < nearest_neighbor_distance:
                     nearest_neighbor_distance = distance
                     nearest_neighbor_location = k
-                    nearest_neighbor_label = data(nearest_neighbor_location, 0)
+                    nearest_neighbor_label = data.iloc[nearest_neighbor_location, 0]
+        if label_object_to_classify == nearest_neighbor_label:
+            count_of_correctly_classified += 1
     print('Object', str(i), 'is class', str(label_object_to_classify))
     print('Its nearest neighbor is', str(nearest_neighbor_location), 'which is in class', str(nearest_neighbor_label))
+    accuracy = count_of_correctly_classified/len(data)
+    print(accuracy)
+    return accuracy
 
 
 def feature_search(data):
@@ -60,4 +66,6 @@ df1 = df.head(5)
 print(df1)
 feature_search(df1)"""
 test_accuracy(small_test_df)
+#hi = small_test_df.iloc[0, 1:7]
+#print(small_test_df.iloc[0, 1:7])
 
