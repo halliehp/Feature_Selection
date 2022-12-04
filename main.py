@@ -17,7 +17,7 @@ def k_fold_cross_validation(data, current_set, feature_to_add):  # returns accur
         features.append(str(x))
     features.append(str(feature_to_add))
     data = data[features]
-    print(data)
+    # print(data)
     # classification accuracy
     count_of_correctly_classified = 0
     for i in range(len(data)):
@@ -36,31 +36,38 @@ def k_fold_cross_validation(data, current_set, feature_to_add):  # returns accur
         if label_object_to_classify == nearest_neighbor_label and nearest_neighbor_label != 0:
             count_of_correctly_classified += 1
     accuracy = count_of_correctly_classified/len(data)
-    print('correctly classified out of 500:', count_of_correctly_classified)
-    print(accuracy)
+    # print('correctly classified out of 500:', count_of_correctly_classified)
+    # print(accuracy)
     return accuracy
 
 
 def feature_search(data):
     current_set_of_features = []
-
-    for x in range(len(data)):
+    best_accuracy = 0
+    best_features = 0
+    # forward selection
+    for x in range(len(data.columns)-1):
         print('On the', x, 'th level of the search tree')
-        feature_to_add_at_this_level = []
         best_so_far_accuracy = 0
+        accuracy = 0
 
         for k in range(len(data.columns)-1):  # make sure to not count the class label column
             if k not in current_set_of_features:
-                current_set_of_features.append(k)
-            print('---Considering adding the', str(k), 'feature')
-            accuracy = k_fold_cross_validation(data, current_set_of_features, k+1)
-
+                # current_set_of_features.append(k)
+                accuracy = k_fold_cross_validation(data, current_set_of_features, k+1)
+                print('---Using features', str(current_set_of_features), str(k), 'the accuracy is', accuracy)
             if accuracy > best_so_far_accuracy:
                 best_so_far_accuracy = accuracy
                 feature_to_add_at_this_level = k
+        current_set_of_features.append(feature_to_add_at_this_level)
         print('On level', str(x), 'I added feature', str(feature_to_add_at_this_level), 'to current set')
+        if best_so_far_accuracy > best_accuracy:
+            best_accuracy = best_so_far_accuracy
+            best_features = current_set_of_features
+    print('best accuracy:', best_accuracy)
+    print('best features:', best_features)
+    return best_features
 
-
-k_fold_cross_validation(test_df, [1, 3], 6)
-# print(small_test_df[['class label','2', '3']])
+# k_fold_cross_validation(test_df, [1, 3], 6)
+feature_search(test_df)
 
