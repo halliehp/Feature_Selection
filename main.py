@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import copy
+import time
 
 df = pd.read_table('CS170_Small_Data__46.txt', engine='python', delimiter='  ',
                    names=['class label', '1', '2', '3', '4', '5', '6'])
@@ -47,31 +48,32 @@ def k_fold_cross_validation_anti_pandas(data, current_set, feature_to_add):  # r
         if label_object_to_classify == nearest_neighbor_label:
             count_of_correctly_classified += 1
     accuracy = count_of_correctly_classified/len(data)
+    accuracy = round(accuracy, 3)
     # print('correctly classified out of 500:', count_of_correctly_classified)
     # print(accuracy)
     return accuracy
 
 
-def feature_search(data):
+def feature_search(file_name):
+    data = pd.read_table(file_name, engine='python', delimiter='  ')
     current_set_of_features = []
     best_accuracy = 0
     best_features = 0
     # forward selection
     for x in range(len(data.columns)-1):
-        # print('On the', x, 'th level of the search tree')
+        print('On the', x, 'th level of the search tree')
         feature_to_add_at_this_level = []
         best_so_far_accuracy = 0
 
         for k in range(len(data.columns)-1):  # make sure to not count the class label column
             if k+1 not in current_set_of_features:
-                # current_set_of_features.append(k)
                 pls = data.to_numpy()
                 accuracy = k_fold_cross_validation_anti_pandas(pls, current_set_of_features, k+1)
-                # print('---Using features', str(current_set_of_features), str(k+1), 'the accuracy is', accuracy)
+                print('---Using features', str(current_set_of_features), str(k+1), 'the accuracy is', accuracy)
                 if accuracy > best_so_far_accuracy:
                     best_so_far_accuracy = accuracy
                     feature_to_add_at_this_level = k+1
-        # print('On level', str(x), 'I added feature', str(feature_to_add_at_this_level), 'to current set')
+        print('On level', str(x), 'I added feature', str(feature_to_add_at_this_level), 'to current set')
         current_set_of_features.append(feature_to_add_at_this_level)
         if best_so_far_accuracy > best_accuracy:
             best_accuracy = best_so_far_accuracy
@@ -81,7 +83,8 @@ def feature_search(data):
     return best_features
 
 
-def backwards_elimination(data):
+def backwards_elimination(file_name):
+    data = pd.read_table(file_name, engine='python', delimiter='  ')
     current_set_of_features = []
     best_accuracy = 0
     best_features = 0
@@ -116,6 +119,14 @@ def backwards_elimination(data):
 
 
 def menu():
-    print('**Feature Selection and Nearest Neighbor Classification Algorithm**')
-    print('')
+    print('**Feature Selection and Nearest Neighbor Classification Algorithm**\n')
+    file_name = input('Type in the name of the file to test: ')
+    print('\n(1) Forward Selection\n(2) Backwards Elimination')
+    algorithm = input('Type the number of the algorithm you want to run: ')
+    if algorithm == '1':
+        feature_search(file_name)
+    if algorithm == '2':
+        backwards_elimination(file_name)
+
+menu()
 
