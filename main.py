@@ -78,8 +78,9 @@ def feature_search(file_name):
         if best_so_far_accuracy > best_accuracy:
             best_accuracy = best_so_far_accuracy
             best_features = copy.deepcopy(current_set_of_features)
+    print('\nSearch finished!')
     print('best accuracy:', best_accuracy)
-    print('best features:', best_features)
+    print('using these features:', best_features)
     return best_features
 
 
@@ -113,8 +114,9 @@ def backwards_elimination(file_name):
         if best_so_far_accuracy > best_accuracy:
             best_accuracy = best_so_far_accuracy
             best_features = copy.deepcopy(current_set_of_features)
+    print('\nSearch finished!')
     print('best accuracy:', best_accuracy)
-    print('best features:', best_features)
+    print('using these features:', best_features)
     return best_features
 
 
@@ -124,9 +126,20 @@ def menu():
     print('\n(1) Forward Selection\n(2) Backwards Elimination')
     algorithm = input('Type the number of the algorithm you want to run: ')
     if algorithm == '1':
+        print('\n Starting Forward Selection')
+        start = time.time()
         feature_search(file_name)
+        end = time.time()
+        elapsed = round(end - start, 1)
+        print('time elapsed: ', elapsed)
     if algorithm == '2':
+        print('\n Starting Backwards Elimination')
+        start = time.time()
         backwards_elimination(file_name)
+        end = time.time()
+        elapsed = round(end - start, 1)
+        print('time elapsed: ', elapsed)
+
 
 menu()
 
