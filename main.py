@@ -11,38 +11,43 @@ small_test_df = df.head(20)
 arr = test_df.to_numpy()
 
 
+def dist(a, b):
+    # cum = a[:] - b[:]
+    cum = a - b
+    return np.dot(cum, cum)
+
+
 def k_fold_cross_validation_anti_pandas(data, current_set, feature_to_add):  # returns accuracy
     # code to do k folding goes here
     features = current_set
     features.append(feature_to_add)
 
-    # features.append(str(feature_to_add))
-    # data = data[features]
-    # print(data)
-    # classification accuracy
     count_of_correctly_classified = 0
     for i in range(len(data)):
         object_to_classify = []
         for p in range(len(features)):
-            object_to_classify.append(data[i][p])  # list of features at index i
+            object_to_classify.append(data[i][features[p]])  # list of features at index i
         label_object_to_classify = data[i][0]  # class label at index i
 
-        nearest_neighbor_distance = math.inf
+        nearest_neighbor_distance = 10000
         nearest_neighbor_label = 0
         for k in range(len(data)):
             if k is not i:
                 temp = []
-                for p in range(len(features)):
-                    temp.append(data[k][p])  # list of features at index i
-                distance = math.sqrt(sum(np.subtract(object_to_classify, temp) ** 2))
+                for s in range(len(features)):
+                    temp.append(data[k][features[s]])  # list of features at index k
+                temp = np.array(temp)
+                # distance = np.sqrt(sum(np.subtract(object_to_classify, temp) ** 2))
+                # distance = np.dot(object_to_classify, temp)
+                distance = dist(object_to_classify, temp)
                 if distance < nearest_neighbor_distance:
                     nearest_neighbor_distance = distance
                     nearest_neighbor_location = k
                     nearest_neighbor_label = data[nearest_neighbor_location][0]
-        if label_object_to_classify == nearest_neighbor_label and nearest_neighbor_label != 0:
+        if label_object_to_classify == nearest_neighbor_label:
             count_of_correctly_classified += 1
     accuracy = count_of_correctly_classified/len(data)
-    # print('correctly classified out of 500:', count_of_correctly_classified)
+    print('correctly classified out of 500:', count_of_correctly_classified)
     print(accuracy)
     return accuracy
 
@@ -92,7 +97,8 @@ def feature_search(data):
         for k in range(len(data.columns)-1):  # make sure to not count the class label column
             if k not in current_set_of_features:
                 # current_set_of_features.append(k)
-                accuracy = k_fold_cross_validation(data, current_set_of_features, k+1)
+                pls = data.to_numpy()
+                accuracy = k_fold_cross_validation_anti_pandas(pls, current_set_of_features, k+1)
                 print('---Using features', str(current_set_of_features), str(k), 'the accuracy is', accuracy)
             if accuracy > best_so_far_accuracy:
                 best_so_far_accuracy = accuracy
@@ -107,8 +113,8 @@ def feature_search(data):
     return best_features
 
 
-k_fold_cross_validation_anti_pandas(arr, [1, 3], 6)
-k_fold_cross_validation(test_df, [1, 3], 6)
-# feature_search(test_df)
+# k_fold_cross_validation_anti_pandas(arr, [1, 3], 6)
+# k_fold_cross_validation(test_df, [1, 3], 6)
+feature_search(test_df)
 # print(arr[4][0])
 
