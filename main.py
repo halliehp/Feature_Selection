@@ -1,11 +1,12 @@
 #  small dataset 46 & large dataset 78
 import pandas as pd
-import math
 import numpy as np
 import copy
 
 df = pd.read_table('CS170_Small_Data__46.txt', engine='python', delimiter='  ',
                    names=['class label', '1', '2', '3', '4', '5', '6'])
+large_df = pd.read_table('CS170_Large_Data__78.txt', engine='python', delimiter='  ',
+                         names=['class label', '1', '2', '3', '4', '5', '6'])
 test_df = pd.read_table('CS170_Small_Data__88.txt', engine='python', delimiter='  ',
                         names=['class label', '1', '2', '3', '4', '5', '6'])
 small_test_df = df.head(20)
@@ -20,7 +21,8 @@ def calculate_distance(a, b):
 def k_fold_cross_validation_anti_pandas(data, current_set, feature_to_add):  # returns accuracy
     # code to do k folding goes here
     features = copy.deepcopy(current_set)
-    features.append(feature_to_add)
+    if feature_to_add != 0:
+        features.append(feature_to_add)
 
     count_of_correctly_classified = 0
     for i in range(len(data)):
@@ -56,7 +58,7 @@ def feature_search(data):
     best_features = 0
     # forward selection
     for x in range(len(data.columns)-1):
-        print('On the', x, 'th level of the search tree')
+        # print('On the', x, 'th level of the search tree')
         feature_to_add_at_this_level = []
         best_so_far_accuracy = 0
 
@@ -65,11 +67,11 @@ def feature_search(data):
                 # current_set_of_features.append(k)
                 pls = data.to_numpy()
                 accuracy = k_fold_cross_validation_anti_pandas(pls, current_set_of_features, k+1)
-                print('---Using features', str(current_set_of_features), str(k+1), 'the accuracy is', accuracy)
+                # print('---Using features', str(current_set_of_features), str(k+1), 'the accuracy is', accuracy)
                 if accuracy > best_so_far_accuracy:
                     best_so_far_accuracy = accuracy
                     feature_to_add_at_this_level = k+1
-        print('On level', str(x), 'I added feature', str(feature_to_add_at_this_level), 'to current set')
+        # print('On level', str(x), 'I added feature', str(feature_to_add_at_this_level), 'to current set')
         current_set_of_features.append(feature_to_add_at_this_level)
         if best_so_far_accuracy > best_accuracy:
             best_accuracy = best_so_far_accuracy
@@ -79,8 +81,41 @@ def feature_search(data):
     return best_features
 
 
-# k_fold_cross_validation_anti_pandas(arr, [1, 3], 6)
-# k_fold_cross_validation(test_df, [1, 3], 6)
-feature_search(test_df)
-# print(arr[4][0])
+def backwards_elimination(data):
+    current_set_of_features = []
+    best_accuracy = 0
+    best_features = 0
+    pls = data.to_numpy()
+    for x in range(len(data.columns) - 1):
+        current_set_of_features.append(x+1)
+    for x in range(len(data.columns)-1):
+        print('On the', x, 'th level of the search tree')
+        feature_to_remove = []
+        best_so_far_accuracy = k_fold_cross_validation_anti_pandas(pls, current_set_of_features, 0)
+        for k in range(len(data.columns)-1):
+            exists = current_set_of_features.count(k+1)
+            if exists > 0:
+                elimination_test = copy.deepcopy(current_set_of_features)
+                elimination_test.remove(k+1)
+                accuracy = k_fold_cross_validation_anti_pandas(pls, elimination_test, 0)
+                print('---Using features', str(elimination_test), 'the accuracy is', accuracy)
+                if accuracy > best_so_far_accuracy:
+                    best_so_far_accuracy = accuracy
+                    feature_to_remove = k+1
+        try:
+            current_set_of_features.remove(feature_to_remove)
+            print('On level', str(x), 'I removed feature', str(feature_to_remove), 'from current set')
+        except:
+            print('List is empty')
+        if best_so_far_accuracy > best_accuracy:
+            best_accuracy = best_so_far_accuracy
+            best_features = copy.deepcopy(current_set_of_features)
+    print('best accuracy:', best_accuracy)
+    print('best features:', best_features)
+    return best_features
+
+
+def menu():
+    print('**Feature Selection and Nearest Neighbor Classification Algorithm**')
+    print('')
 
