@@ -32,10 +32,10 @@ def k_fold_cross_validation_anti_pandas(data, current_set, feature_to_add):  # r
             object_to_classify.append(data[i][features[p]])  # list of features at index i
         label_object_to_classify = data[i][0]  # class label at index i
 
-        nearest_neighbor_distance = 10000
+        nearest_neighbor_distance = np.inf
         nearest_neighbor_label = 0
         for k in range(len(data)):
-            if k is not i:
+            if k != i:
                 temp = []
                 for s in range(len(features)):
                     temp.append(data[k][features[s]])  # list of features at index k
