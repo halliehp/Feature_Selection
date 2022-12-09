@@ -140,6 +140,5 @@ def menu():
         print('time elapsed: ', elapsed)
 
 
-# menu()
-backwards_elimination('CS170_Small_Data__46.txt')
+menu()
 
