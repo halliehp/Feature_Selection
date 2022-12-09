@@ -21,6 +21,8 @@ def calculate_distance(a, b):
 
 def k_fold_cross_validation_anti_pandas(data, current_set, feature_to_add):  # returns accuracy
     # code to do k folding goes here
+    if len(current_set) == 0:
+        return 0.5  # hard coded to 0.5 because it is random if there's no features
     features = copy.deepcopy(current_set)
     if feature_to_add != 0:
         features.append(feature_to_add)
@@ -92,11 +94,11 @@ def backwards_elimination(file_name):
     pls = data.to_numpy()
     for x in range(len(data.columns) - 1):
         current_set_of_features.append(x+1)
-    for x in range(len(data.columns)-1):
+    for x in range(len(data.columns) - 1):
         print('On the', x, 'th level of the search tree')
         feature_to_remove = []
-        best_so_far_accuracy = k_fold_cross_validation_anti_pandas(pls, current_set_of_features, 0)
-        for k in range(len(data.columns)-1):
+        best_so_far_accuracy = 0
+        for k in range(len(data.columns) - 1):
             exists = current_set_of_features.count(k+1)
             if exists > 0:
                 elimination_test = copy.deepcopy(current_set_of_features)
@@ -106,11 +108,8 @@ def backwards_elimination(file_name):
                 if accuracy > best_so_far_accuracy:
                     best_so_far_accuracy = accuracy
                     feature_to_remove = k+1
-        try:
-            current_set_of_features.remove(feature_to_remove)
-            print('On level', str(x), 'I removed feature', str(feature_to_remove), 'from current set')
-        except:
-            print('List is empty')
+        current_set_of_features.remove(feature_to_remove)
+        print('On level', str(x), 'I removed feature', str(feature_to_remove), 'from current set')
         if best_so_far_accuracy > best_accuracy:
             best_accuracy = best_so_far_accuracy
             best_features = copy.deepcopy(current_set_of_features)
@@ -141,5 +140,6 @@ def menu():
         print('time elapsed: ', elapsed)
 
 
-menu()
+# menu()
+backwards_elimination('CS170_Small_Data__46.txt')
 
